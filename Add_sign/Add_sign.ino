@@ -2,7 +2,7 @@
 Sign Language Translator, 
 Project by: 
 Group Apocolopsy
-University of Colombo Sch ool of Computing
+University of Colombo School of Computing
 Made with Arduino
 */
 #include <SoftwareSerial.h> //Bluetooth Library
@@ -29,6 +29,7 @@ const int sensorPinRING = A3;    // pin that the RING flex sensor is attached to
 //const int sensorPinPINKEY = A4;    // pin that the PINKEY flex sensor is attached to
 //const int xPin = 2;    
 //const int yPin = 3;   // y output of the accelerometer
+
 
 const int switchPin = 36;
 const int ledPinBLUE = 4;        // pin that the LED is attached to
@@ -61,6 +62,7 @@ void setup() {
   
   // turn on LED to signal the start of the calibration period:
   pinMode(6, OUTPUT);
+  pinMode(4, OUTPUT);
   pinMode(9, OUTPUT);
   pinMode(18, OUTPUT);
 
@@ -70,7 +72,7 @@ void setup() {
 //  pinMode(xPin, INPUT);
 //  pinMode(yPin, INPUT);
   
-  digitalWrite(ledPinBLUE, HIGH); 
+  digitalWrite(4, HIGH); 
   
   Serial.begin (9600);
   BTserial.begin(9600);
@@ -80,7 +82,7 @@ void setup() {
 
   Serial.print ("Callibration Started");
   // calibrate during the first second seconds 
-  while (millis() < 7000) {
+  while (millis() < 9000) {
       // Compass Calibration
       compass.read();
       running_min.x = min(running_min.x, compass.a.x);
@@ -221,6 +223,11 @@ void loop() {
   acl_X = constrain(acl_X, -2000, 2000);
   acl_Y = constrain(acl_Y, -2000, 2000);
 
+
+  //Switch
+  switchVal = digitalRead(switchPin);
+  Serial.print("Switch value : ");
+  Serial.println(switchVal);
   
   Serial.println ("-------------------");
   Serial.print ("sensorValue-THUMB = ");
@@ -248,6 +255,14 @@ void loop() {
 //Acceleration data printing
 snprintf(mp, sizeof(mp), "acceleration : { X = %d, Y = %d}" ,acl_X,acl_Y );
 Serial.println(mp);
+
+//Send Sensor values to the mobile phone
+String dumpString = "*";
+String endString = ";";
+BTserial.print(switchVal + dumpString + sensorValueTHUMB + dumpString + sensorValueINDEX + dumpString + sensorValueMIDDLE + dumpString + sensorValueRING + dumpString + acl_X + dumpString + acl_Y + endString);
+
+
+
 //Acceleration data printing Bluetooth
 //BTserial.print("acceleration-X = ");  
 //BTserial.println(acl_X);
@@ -255,10 +270,6 @@ Serial.println(mp);
 //BTserial.println(acl_Y);
 //BTserial.println(";");
 //   
-
-  //Switch
-  switchVal = digitalRead(switchPin);
-  Serial.println(switchVal);
 
 //  counter = counter + 1;
 //  Serial.print("Count : ");
@@ -302,76 +313,62 @@ Serial.println(mp);
 //   digitalWrite (ledPinBLUE, LOW); 
 //  }
 
-  
-  //--------------------------------LetterA-----------------------------
-  
-  if (sensorValueTHUMB < 150 && sensorValueINDEX > 100 && sensorValueMIDDLE > 100) {
-    
-    Serial.println  ("\n");
-    Serial.println ("A"); //Print letter A to serial
-    Serial.println  ("        ");
-    //Bluetooth data sending 
-    BTserial.print("A");
-    BTserial.print(";");
-    
-  }
-  
-  else {
-    
-  }
 //  
-//  //--------------------------------LetterB-----------------------------
-  
-  if (sensorValueTHUMB > 180 && sensorValueINDEX < 20 && sensorValueMIDDLE < 20 ) {
-    
-    Serial.println ("B"); //Print letter B to serial
-    Serial.println  ("        ");
-    //Bluetooth data sending 
-    BTserial.print("B");
-    BTserial.print(";");
-  }
-  
-  else {
-    
-  }
+//  //--------------------------------LetterA-----------------------------
 //  
-//  //--------------------------------LetterC-----------------------------
-//  
-//  
-   if (sensorValueRING > 30 && sensorValueRING < 140 && sensorValueTHUMB > 50 && sensorValueTHUMB < 100) {
-    
-    Serial.println ("C"); //Print letter C to serial
-    Serial.println  ("        ");
-    //Bluetooth data sending 
-    BTserial.print("C");
-    BTserial.print(";");
-   
-  }
-  
-  else {
-   
-  }
-//  
-//  //--------------------------------LetterD-----------------------------
-  
-  
-  if (sensorValueINDEX < 70 && sensorValueMIDDLE > 190 && sensorValueRING > 190 && acl_Y < -1500 ) {
-    
-    Serial.println ("D"); //Print letter D to serial
-    Serial.println  ("        ");
-    
-  }
-  
-  else {
-   
-  }
-//  
-//  //--------------------------------LetterE-----------------------------
-//  
-  
-//  if (sensorValueTHUMB > 120 && sensorValueINDEX > 150 && sensorValueMIDDLE > 150 && sensorValueRING > 150 ) {
+//  if (sensorValueTHUMB < 150 && sensorValueINDEX > 100 && sensorValueMIDDLE > 100) {
 //    
-//    Serial.println ("E"); //Print letter E to serial
+//    Serial.println  ("\n");
+//    Serial.println ("A"); //Print letter A to serial
+//    Serial.println  ("        ");
+//    //Bluetooth data sending 
+////    BTserial.print("A");
+////    BTserial.print(";");
+//    
+//  }
+//  
+//  else {
+//    
+//  }
+////  
+////  //--------------------------------LetterB-----------------------------
+//  
+//  if (sensorValueTHUMB > 180 && sensorValueINDEX < 20 && sensorValueMIDDLE < 20 ) {
+//    
+//    Serial.println ("B"); //Print letter B to serial
+//    Serial.println  ("        ");
+//    //Bluetooth data sending 
+//    BTserial.print("B");
+//    BTserial.print(";");
+//  }
+//  
+//  else {
+//    
+//  }
+////  
+////  //--------------------------------LetterC-----------------------------
+////  
+////  
+//   if (sensorValueRING > 30 && sensorValueRING < 140 && sensorValueTHUMB > 50 && sensorValueTHUMB < 100) {
+//    
+//    Serial.println ("C"); //Print letter C to serial
+//    Serial.println  ("        ");
+//    //Bluetooth data sending 
+//    BTserial.print("C");
+//    BTserial.print(";");
+//   
+//  }
+//  
+//  else {
+//   
+//  }
+////  
+////  //--------------------------------LetterD-----------------------------
+//  
+//  
+//  if (sensorValueINDEX < 70 && sensorValueMIDDLE > 190 && sensorValueRING > 190 && acl_Y < -1500 ) {
+//    
+//    Serial.println ("D"); //Print letter D to serial
 //    Serial.println  ("        ");
 //    
 //  }
@@ -379,76 +376,90 @@ Serial.println(mp);
 //  else {
 //   
 //  }
+////  
+////  //--------------------------------LetterE-----------------------------
+////  
 //  
-//  //--------------------------------LetterF-----------------------------
-//  
-//  
-//  if (sensorValueTHUMB == 1 && sensorValueINDEX == 1 && sensorValueMIDDLE > 200 && sensorValueRING > 200 && accelerationX > 650) {
+////  if (sensorValueTHUMB > 120 && sensorValueINDEX > 150 && sensorValueMIDDLE > 150 && sensorValueRING > 150 ) {
+////    
+////    Serial.println ("E"); //Print letter E to serial
+////    Serial.println  ("        ");
+////    
+////  }
+////  
+////  else {
+////   
+////  }
+////  
+////  //--------------------------------LetterF-----------------------------
+////  
+////  
+////  if (sensorValueTHUMB == 1 && sensorValueINDEX == 1 && sensorValueMIDDLE > 200 && sensorValueRING > 200 && accelerationX > 650) {
+////    
+////    Serial.println ("F"); //Print letter F to serial
+////    Serial.println  ("        ");
+////    
+////  }
+////  
+////  else {
+////   
+////  }
+////  
+////  //--------------------------------LetterG-----------------------------
+////  
+////  
+////  if (sensorValueTHUMB > 150 && sensorValueINDEX > 150 && sensorValueMIDDLE == 1 && sensorValueRING == 1  && accelerationX < 300) {
+////    
+////    Serial.println ("G"); //Print letter G to serial
+////    Serial.println  ("        ");
+////    
+////  }
+////  
+////  else {
+////   
+////  }
+////    //--------------------------------HELLO-----------------------------
+////  
+//  if (sensorValueINDEX < 20 && sensorValueMIDDLE < 20 && acl_Y < -800 ) {
 //    
-//    Serial.println ("F"); //Print letter F to serial
+//    Serial.println ("Hello!"); //Print letter H to serial
 //    Serial.println  ("        ");
+//    //Bluetooth data sending 
+//    BTserial.print("Hello");
+//    BTserial.print(";");
+//  }
+//  
+//  else {
+//   
+//  }
+////--------------------------------YOU-----------------------------
+//if (sensorValueINDEX < 30 && sensorValueMIDDLE > 190 && sensorValueRING > 190 && acl_Y > -100 ) {
+//    
+//    Serial.println ("You!"); //Print letter H to serial
+//    Serial.println  ("        ");
+//    //Bluetooth data sending 
+//    BTserial.print("You");
+//    BTserial.print(";");
 //    
 //  }
 //  
 //  else {
 //   
 //  }
-//  
-//  //--------------------------------LetterG-----------------------------
-//  
-//  
-//  if (sensorValueTHUMB > 150 && sensorValueINDEX > 150 && sensorValueMIDDLE == 1 && sensorValueRING == 1  && accelerationX < 300) {
+//
+//  //--------------------------------Me-----------------------------
+//if (sensorValueINDEX < 70 && sensorValueMIDDLE > 190 && sensorValueRING > 190 && acl_Y < -500 && acl_Y > -1500 ) {
 //    
-//    Serial.println ("G"); //Print letter G to serial
+//    Serial.println ("You!"); //Print letter H to serial
 //    Serial.println  ("        ");
-//    
+//    //Bluetooth data sending 
+//    BTserial.print("You");
+//    BTserial.print(";");
 //  }
 //  
 //  else {
 //   
-//  }
-//    //--------------------------------HELLO-----------------------------
-//  
-  if (sensorValueINDEX < 20 && sensorValueMIDDLE < 20 && acl_Y < -800 ) {
-    
-    Serial.println ("Hello!"); //Print letter H to serial
-    Serial.println  ("        ");
-    //Bluetooth data sending 
-    BTserial.print("Hello");
-    BTserial.print(";");
-  }
-  
-  else {
-   
-  }
-//--------------------------------YOU-----------------------------
-if (sensorValueINDEX < 30 && sensorValueMIDDLE > 190 && sensorValueRING > 190 && acl_Y > -100 ) {
-    
-    Serial.println ("You!"); //Print letter H to serial
-    Serial.println  ("        ");
-    //Bluetooth data sending 
-    BTserial.print("You");
-    BTserial.print(";");
-    
-  }
-  
-  else {
-   
-  }
-
-  //--------------------------------Me-----------------------------
-if (sensorValueINDEX < 70 && sensorValueMIDDLE > 190 && sensorValueRING > 190 && acl_Y < -500 && acl_Y > -1500 ) {
-    
-    Serial.println ("You!"); //Print letter H to serial
-    Serial.println  ("        ");
-    //Bluetooth data sending 
-    BTserial.print("You");
-    BTserial.print(";");
-  }
-  
-  else {
-   
-  } 
+//  } 
   
   
   delay (1000);
